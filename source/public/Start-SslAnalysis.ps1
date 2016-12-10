@@ -40,12 +40,17 @@ function Start-SslAnalysis {
     process {
         foreach ($name in $hostname) {
             $Body = @{
-                host           = $Hostname
+                host           = $name
                 publish        = @('off', 'on')[$Publish.ToBool()]
                 fromCache      = @('off', 'on')[$FromCache.ToBool()]
                 ignoreMismatch = @('off', 'on')[$IgnoreMismatch.ToBool()] 
             }
             $restResponse = Invoke-RestMethod @params -Body $Body
+            foreach ($property in $restResponse.PSObject.Properties) {
+                if ($property.Name.EndsWith('Time')) {
+                    $property.Value = (Get-Date 01/01/1970) + (New-Object TimeSpan($property.Value * 10000))
+                }
+            }
             if ($Wait) {
                 $null = $jobs.Add($restResponse)
             } else {
