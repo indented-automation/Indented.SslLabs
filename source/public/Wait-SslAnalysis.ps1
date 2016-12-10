@@ -33,6 +33,9 @@ function Wait-SslAnalysis {
             $keys = $executingTests.Keys | ForEach-Object { $_ }
             foreach ($key in $keys) {
                 $restResponse = Start-SslAnalysis -Hostname $key
+
+                Write-Debug ('Status: {0}' -f $restResponse.status)
+
                 if ($restResponse.status -eq 'READY') {
                     $null = $executingTests.Remove($key)
                     
